@@ -1,0 +1,5 @@
+node_modules
+node.exe
+dist/
+server.log
+server.err

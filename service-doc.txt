@@ -1,0 +1,322 @@
+================================================================================
+  Lvovich — склонение русских ФИО и городов
+================================================================================
+
+  SOAP:        http://localhost:3000/soap
+  WSDL:        http://localhost:3000/wsdl
+  REST:        http://localhost:3000/api/*
+  Swagger UI:  http://localhost:3000/api-docs
+  Запуск:      start-server.cmd  (или npm run soap)
+
+
+================================================================================
+  КОНФИГУРАЦИЯ (config.ini)
+================================================================================
+
+  Файл config.ini в корне проекта:
+
+    [server]
+    address = 0.0.0.0
+    port = 3000
+    swagger = true
+
+    [auth]
+    token = mysecret
+    ; список разрешённых IP через запятую, пусто = все
+    allowed_ips = 127.0.0.1, ::1
+
+  Параметры:
+    server.address   - адрес для привязки (по умолч. 0.0.0.0)
+    server.port      - порт HTTP-сервера (по умолч. 3000)
+    server.swagger   - включить/отключить Swagger UI (по умолч. true)
+    auth.token       - токен авторизации (пусто = отключена)
+    auth.allowed_ips - список разрешённых IP через запятую (пусто = все)
+
+
+================================================================================
+  АВТОРИЗАЦИЯ И ОГРАНИЧЕНИЕ ПО IP
+================================================================================
+
+  Если в config.ini задан token, все запросы к /api/* и /soap
+  требуют заголовок:
+
+    Authorization: Bearer <token>
+
+  Если задан allowed_ips, запросы разрешены только с указанных IP
+  (работает независимо от токена).
+  WSDL (/wsdl) доступен без ограничений.
+  Swagger UI (/api-docs) доступен только если в config.ini указано swagger = true.
+
+
+================================================================================
+  ЛОГИРОВАНИЕ
+================================================================================
+
+  Сервер пишет все запросы в файл server.log в корне проекта.
+  Формат строки:
+
+    [2026-07-16 00:30:26.673] <IP клиента> <METHOD> <path> - <body>
+
+
+================================================================================
+  REST API
+================================================================================
+
+  Все REST-методы требуют заголовок Authorization: Bearer <token>
+  (если токен задан в config.ini).
+
+  Ошибки REST:
+    401 - отсутствует или неверный токен
+    403 - IP не входит в allowed_ips
+
+
+  POST /api/incline — склонение ФИО
+  --------------------------------------------------------------------------------
+    Body (JSON):
+      FirstName  - string, необяз. - Имя
+      SurName    - string, необяз. - Фамилия
+      SecondName - string, необяз. - Отчество
+      declension - string, необяз. - Падеж: nominative, genitive, dative,
+                                      accusative, instrumental, prepositional)
+      format     - string, необяз. - "full" (по умолч.) или "initials"
+
+    Пример (format=full):
+      > POST /api/incline
+      > Authorization: Bearer mysecret
+      > {"SurName":"Иванов","FirstName":"Иван","SecondName":"Иванович","declension":"dative"}
+      < {"FirstName":"Ивану","SurName":"Иванову","SecondName":"Ивановичу","gender":"male"}
+
+    Пример (format=initials):
+      > Authorization: Bearer mysecret
+      > {"SurName":"Петров","FirstName":"Пётр","SecondName":"Петрович",
+         "declension":"genitive","format":"initials"}
+      < {"SurName":"Петрова","initials":"П.П."}
+
+
+  POST /api/gender — определение пола
+  --------------------------------------------------------------------------------
+    Body (JSON): {"SurName":"Смирнова","FirstName":"Анна"}
+    Ответ:       {"gender":"female"}
+
+
+  POST /api/city/in — город в предложном падеже (в каком?)
+  --------------------------------------------------------------------------------
+    Body (JSON): {"name":"Москва","gender":"female"}
+    Ответ:       {"name":"Москве"}
+
+
+  POST /api/city/from — город в родительном падеже (из какого?)
+  --------------------------------------------------------------------------------
+    Body (JSON): {"name":"Москва"}
+    Ответ:       {"name":"Москвы"}
+
+
+  POST /api/city/to — город в винительном падеже (в какой?)
+  --------------------------------------------------------------------------------
+    Body (JSON): {"name":"Москва"}
+    Ответ:       {"name":"Москву"}
+
+
+================================================================================
+  SOAP-СЕРВИС
+================================================================================
+
+
+1. Incline - склонение ФИО по падежам
+--------------------------------------------------------------------------------
+
+  Параметры:
+    LastName   - string, необяз. - Фамилия
+    FirstName  - string, необяз. - Имя
+    MiddleName - string, необяз. - Отчество
+    Declension - string, необяз. - Падеж (см. ниже)
+    Format     - string, необяз. - "full" (по умолч.) или "initials"
+
+  Падежи (Declension):
+    nominative     - Именительный  (Иванов)
+    genitive       - Родительный   (Иванова)
+    dative         - Дательный     (Иванову)
+    accusative     - Винительный   (Иванова)
+    instrumental   - Творительный  (Ивановым)
+    prepositional  - Предложный    (Иванове)
+
+  Ответ (Format=full):
+    FirstName  - string - Имя в нужном падеже
+    LastName   - string - Фамилия в нужном падеже
+    MiddleName - string - Отчество в нужном падеже
+    Gender     - string - "male", "female" или "androgynous"
+
+  Ответ (Format=initials):
+    LastName   - string - Фамилия в нужном падеже
+    Initials   - string - Инициалы вида "И." или "И.И."
+
+  Пример запроса (full, dative):
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <Incline xmlns="urn:LvovichService">
+          <LastName>Иванов</LastName>
+          <FirstName>Иван</FirstName>
+          <MiddleName>Иванович</MiddleName>
+          <Declension>dative</Declension>
+        </Incline>
+      </soap:Body>
+    </soap:Envelope>
+
+  Пример ответа:
+    <FirstName>Ивану</FirstName>
+    <LastName>Иванову</LastName>
+    <MiddleName>Ивановичу</MiddleName>
+    <Gender>male</Gender>
+
+  Пример запроса (initials, genitive):
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <Incline xmlns="urn:LvovichService">
+          <LastName>Петров</LastName>
+          <FirstName>Пётр</FirstName>
+          <MiddleName>Петрович</MiddleName>
+          <Declension>genitive</Declension>
+          <Format>initials</Format>
+        </Incline>
+      </soap:Body>
+    </soap:Envelope>
+
+  Пример ответа:
+    <LastName>Петрова</LastName>
+    <Initials>П.П.</Initials>
+
+
+2. GetGender - определение пола по ФИО
+--------------------------------------------------------------------------------
+
+  Параметры:
+    LastName   - string, необяз. - Фамилия
+    FirstName  - string, необяз. - Имя
+    MiddleName - string, необяз. - Отчество
+
+  Ответ:
+    Gender     - string - "male", "female" или "androgynous"
+
+  Пример запроса:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <GetGender xmlns="urn:LvovichService">
+          <LastName>Смирнова</LastName>
+          <FirstName>Анна</FirstName>
+        </GetGender>
+      </soap:Body>
+    </soap:Envelope>
+
+  Пример ответа:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <GetGenderResponse xmlns="urn:LvovichService">
+          <Gender>female</Gender>
+        </GetGenderResponse>
+      </soap:Body>
+    </soap:Envelope>
+
+
+3. CityIn - город в предложном падеже (в каком?)
+-------------------------------------------------------------------------------
+
+  Параметры:
+    Name   - string, обязат. - Название города
+    Gender - string, необяз. - Пол для согласования
+
+  Пример запроса:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <CityIn xmlns="urn:LvovichService">
+          <Name>Москва</Name>
+          <Gender>female</Gender>
+        </CityIn>
+      </soap:Body>
+    </soap:Envelope>
+
+  Пример ответа:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <CityInResponse xmlns="urn:LvovichService">
+          <Name>Москве</Name>
+        </CityInResponse>
+      </soap:Body>
+    </soap:Envelope>
+
+
+4. CityFrom - город в родительном падеже (из какого?)
+-------------------------------------------------------------------------------
+
+  Параметры:
+    Name   - string, обязат. - Название города
+    Gender - string, необяз. - Пол для согласования
+
+  Пример запроса:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <CityFrom xmlns="urn:LvovichService">
+          <Name>Москва</Name>
+          <Gender>female</Gender>
+        </CityFrom>
+      </soap:Body>
+    </soap:Envelope>
+
+  Пример ответа:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <CityFromResponse xmlns="urn:LvovichService">
+          <Name>Москвы</Name>
+        </CityFromResponse>
+      </soap:Body>
+    </soap:Envelope>
+
+
+5. CityTo - город в винительном падеже (в какой?)
+-------------------------------------------------------------------------------
+
+  Параметры:
+    Name - string, обязат. - Название города
+
+  Пример запроса:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <CityTo xmlns="urn:LvovichService">
+          <Name>Москва</Name>
+        </CityTo>
+      </soap:Body>
+    </soap:Envelope>
+
+  Пример ответа:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <CityToResponse xmlns="urn:LvovichService">
+          <Name>Москву</Name>
+        </CityToResponse>
+      </soap:Body>
+    </soap:Envelope>
+
+
+================================================================================
+  СВОДНАЯ ТАБЛИЦА ENDPOINT-ОВ
+================================================================================
+
+  Адрес и порт задаются в config.ini (по умолчанию http://localhost:3000).
+
+  SOAP        /soap          SOAP-сервис
+  WSDL        /wsdl          WSDL-схема
+  REST        /api/incline   Склонение ФИО (JSON)
+  REST        /api/gender    Определение пола (JSON)
+  REST        /api/city/in   Город предложный (JSON)
+  REST        /api/city/from Город родительный (JSON)
+  REST        /api/city/to   Город винительный (JSON)
+  Swagger     /api-docs      Интерактивная документация
