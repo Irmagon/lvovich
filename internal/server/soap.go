@@ -186,8 +186,8 @@ func (s *Server) soapIncline(w http.ResponseWriter, opEl *soapNode, args *soapNo
 		fields = appendIf(fields, "LastName", res.SurName)
 		fields = appendIf(fields, "Initials", res.Initials)
 	} else {
-		fields = appendIf(fields, "FirstName", res.FirstName)
 		fields = appendIf(fields, "LastName", res.SurName)
+		fields = appendIf(fields, "FirstName", res.FirstName)
 		fields = appendIf(fields, "MiddleName", res.SecondName)
 		fields = appendIf(fields, "Gender", res.Gender)
 	}
@@ -359,21 +359,43 @@ func xmlEscape(s string) string {
 	return b.String()
 }
 
-// soapArgsJSON — JSON.stringify(args) в представлении node-soap (порядок ключей — порядок в документе).
+// soapArgsJSON — JSON.stringify(args) в представлении node-soap:
+// ключи ФИО (LastName, FirstName, MiddleName) идут первыми, затем остальные
+// в порядке документа.
 func soapArgsJSON(args *soapNode) string {
 	if args == nil {
 		return "null"
 	}
+	var rest []*soapNode
 	var b strings.Builder
 	b.WriteByte('{')
-	for i, c := range args.children {
-		if i > 0 {
+	first := true
+	write := func(n *soapNode) {
+		if !first {
 			b.WriteByte(',')
 		}
+		first = false
 		b.WriteByte('"')
-		jsEscapeStr(c.local, &b)
+		jsEscapeStr(n.local, &b)
 		b.WriteString(`":`)
-		soapWriteElem(&b, c)
+		soapWriteElem(&b, n)
+	}
+	for _, k := range []string{"LastName", "FirstName", "MiddleName"} {
+		for _, c := range args.children {
+			if c.local == k {
+				write(c)
+				break
+			}
+		}
+	}
+	for _, c := range args.children {
+		if c.local == "LastName" || c.local == "FirstName" || c.local == "MiddleName" {
+			continue
+		}
+		rest = append(rest, c)
+	}
+	for _, c := range rest {
+		write(c)
 	}
 	b.WriteByte('}')
 	return b.String()

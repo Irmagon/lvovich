@@ -73,7 +73,30 @@ func bodyLogText(r *http.Request) string {
 	if bi == nil || bi.value == nil {
 		return "undefined"
 	}
-	return JStringify(bi.value)
+	return JStringify(reorderFIO(bi.value))
+}
+
+// reorderFIO — переставляет ключи ФИО (SurName, FirstName, SecondName) в начало
+// объекта, сохраняя порядок остальных ключей.
+func reorderFIO(v *JValue) *JValue {
+	if v == nil || v.Type != JObj {
+		return v
+	}
+	out := Obj()
+	for _, k := range []string{"SurName", "FirstName", "SecondName"} {
+		if val := v.Get(k); val != nil {
+			out.Set(k, val)
+		}
+	}
+	for _, k := range v.Keys() {
+		if k == "SurName" || k == "FirstName" || k == "SecondName" {
+			continue
+		}
+		if val := v.Get(k); val != nil {
+			out.Set(k, val)
+		}
+	}
+	return out
 }
 
 // syntaxErrorHTML — сообщение body-parser в express-форме.
@@ -317,11 +340,11 @@ func (s *Server) handleRestIncline(w http.ResponseWriter, r *http.Request) {
 		obj.Set("SurName", Str(res.SurName))
 		obj.Set("initials", Str(res.Initials))
 	} else {
-		if first != "" {
-			obj.Set("FirstName", Str(res.FirstName))
-		}
 		if sur != "" {
 			obj.Set("SurName", Str(res.SurName))
+		}
+		if first != "" {
+			obj.Set("FirstName", Str(res.FirstName))
 		}
 		if second != "" {
 			obj.Set("SecondName", Str(res.SecondName))

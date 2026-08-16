@@ -64,14 +64,14 @@ func TestRestInclineFull(t *testing.T) {
 	if r.status != 200 {
 		t.Fatalf("status=%d", r.status)
 	}
-	want := `{"FirstName":"Ивану","SurName":"Иванову","SecondName":"Ивановичу","gender":"male"}`
+	want := `{"SurName":"Иванову","FirstName":"Ивану","SecondName":"Ивановичу","gender":"male"}`
 	if r.body != want {
 		t.Errorf("body=%q want=%q", r.body, want)
 	}
 	if r.ct != "application/json; charset=utf-8" {
 		t.Errorf("ct=%q", r.ct)
 	}
-	if r.etag != `W/"67-W24821eAt06Vq7JQ3qF+0a0gK4c"` {
+	if r.etag != `W/"67-cRkPwL0pcV2myUWCffwApguWrOw"` {
 		t.Errorf("etag=%q", r.etag)
 	}
 }
@@ -207,7 +207,7 @@ func TestSoapInclineFull(t *testing.T) {
 	r := doReq(t, "POST", base+"/soap", map[string]string{
 		"Authorization": authHdr, "Content-Type": "text/xml", "SOAPAction": "urn:Incline",
 	}, xmlReq)
-	want := "<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"  xmlns:tns=\"urn:LvovichService\"><soap:Body><tns:InclineResponse><InclineResponse><FirstName>Ивану</FirstName><LastName>Иванову</LastName><MiddleName>Ивановичу</MiddleName><Gender>male</Gender></InclineResponse></tns:InclineResponse></soap:Body></soap:Envelope>"
+	want := "<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"  xmlns:tns=\"urn:LvovichService\"><soap:Body><tns:InclineResponse><InclineResponse><LastName>Иванову</LastName><FirstName>Ивану</FirstName><MiddleName>Ивановичу</MiddleName><Gender>male</Gender></InclineResponse></tns:InclineResponse></soap:Body></soap:Envelope>"
 	if r.status != 200 || r.body != want {
 		t.Errorf("status=%d\nbody=%s\nwant=%s", r.status, r.body, want)
 	}

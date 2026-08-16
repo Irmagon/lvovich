@@ -3,3 +3,5 @@ node.exe
 dist/
 server.log
 server.err
+fioincline-server.exe
+test-output/
