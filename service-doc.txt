@@ -6,7 +6,8 @@
   WSDL:        http://localhost:3000/wsdl
   REST:        http://localhost:3000/api/*
   Swagger UI:  http://localhost:3000/api-docs
-  Запуск:      start-server.cmd  (или npm run soap)
+  Запуск:      go run ./cmd/server   (или собранный бинарь fioincline-server.exe)
+  Тесты:       run-tests.cmd  (сборка + go test ./... с логом в test-output\)
 
 
 ================================================================================
@@ -84,7 +85,7 @@
       > POST /api/incline
       > Authorization: Bearer mysecret
       > {"SurName":"Иванов","FirstName":"Иван","SecondName":"Иванович","declension":"dative"}
-      < {"FirstName":"Ивану","SurName":"Иванову","SecondName":"Ивановичу","gender":"male"}
+      < {"SurName":"Иванову","FirstName":"Ивану","SecondName":"Ивановичу","gender":"male"}
 
     Пример (format=initials):
       > Authorization: Bearer mysecret
@@ -164,8 +165,8 @@
     </soap:Envelope>
 
   Пример ответа:
-    <FirstName>Ивану</FirstName>
     <LastName>Иванову</LastName>
+    <FirstName>Ивану</FirstName>
     <MiddleName>Ивановичу</MiddleName>
     <Gender>male</Gender>
 
