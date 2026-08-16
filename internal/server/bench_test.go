@@ -13,7 +13,15 @@ import (
 // запись на диск на каждый запрос является частью замера).
 func benchServer(b *testing.B) *Server {
 	b.Helper()
-	return NewServer(testCfg(), filepath.Join(b.TempDir(), "server.log"))
+	return benchServerCfg(b, testCfg())
+}
+
+// benchServerCfg создаёт сервер с заданным конфигом (mode sync/async).
+func benchServerCfg(b *testing.B, cfg Config) *Server {
+	b.Helper()
+	h := NewServer(cfg, filepath.Join(b.TempDir(), "server.log"))
+	b.Cleanup(h.Close)
+	return h
 }
 
 // benchReq прогоняет один запрос через handler сервера.
@@ -66,6 +74,39 @@ func BenchmarkRestCityIn(b *testing.B) {
 func BenchmarkSoapIncline(b *testing.B) {
 	const soapBody = `<?xml version="1.0" encoding="UTF-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><Incline xmlns="urn:LvovichService"><LastName>Иванов</LastName><FirstName>Иван</FirstName><MiddleName>Иванович</MiddleName><Declension>dative</Declension></Incline></soap:Body></soap:Envelope>`
 	benchReq(b, benchServer(b), http.MethodPost, "/soap", "text/xml", soapBody)
+}
+
+// syncCfg — конфиг с режимом лога "sync" (прямая запись на диск на каждый вызов),
+// для сравнения с асинхронным флашем.
+func syncCfg() Config {
+	c := testCfg()
+	c.LogMode = "sync"
+	return c
+}
+
+func BenchmarkSyncRestInclineFull(b *testing.B) {
+	benchReq(b, benchServerCfg(b, syncCfg()), http.MethodPost, "/api/incline", "application/json",
+		`{"SurName":"Иванов","FirstName":"Иван","SecondName":"Иванович","declension":"dative"}`)
+}
+
+func BenchmarkSyncRestGender(b *testing.B) {
+	benchReq(b, benchServerCfg(b, syncCfg()), http.MethodPost, "/api/gender", "application/json",
+		`{"SurName":"Смирнова","FirstName":"Анна"}`)
+}
+
+func BenchmarkSyncSoapIncline(b *testing.B) {
+	const soapBody = `<?xml version="1.0" encoding="UTF-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><Incline xmlns="urn:LvovichService"><LastName>Иванов</LastName><FirstName>Иван</FirstName><MiddleName>Иванович</MiddleName><Declension>dative</Declension></Incline></soap:Body></soap:Envelope>`
+	benchReq(b, benchServerCfg(b, syncCfg()), http.MethodPost, "/soap", "text/xml", soapBody)
+}
+
+func BenchmarkSyncParallelRestGender(b *testing.B) {
+	benchReqParallel(b, benchServerCfg(b, syncCfg()), http.MethodPost, "/api/gender", "application/json",
+		`{"SurName":"Смирнова","FirstName":"Анна"}`)
+}
+
+func BenchmarkSyncParallelSoapIncline(b *testing.B) {
+	const soapBody = `<?xml version="1.0" encoding="UTF-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><Incline xmlns="urn:LvovichService"><LastName>Иванов</LastName><FirstName>Иван</FirstName><MiddleName>Иванович</MiddleName><Declension>dative</Declension></Incline></soap:Body></soap:Envelope>`
+	benchReqParallel(b, benchServerCfg(b, syncCfg()), http.MethodPost, "/soap", "text/xml", soapBody)
 }
 
 // benchReqParallel гоняет запросы из нескольких горутин (b.RunParallel),

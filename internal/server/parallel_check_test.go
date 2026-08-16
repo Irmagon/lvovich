@@ -11,6 +11,7 @@ import (
 
 func TestParallelStatuses(t *testing.T) {
 	h := NewServer(testCfg(), filepath.Join(t.TempDir(), "server.log"))
+	t.Cleanup(h.Close)
 	const soapBody = `<?xml version="1.0" encoding="UTF-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><Incline xmlns="urn:LvovichService"><LastName>Иванов</LastName><FirstName>Иван</FirstName><MiddleName>Иванович</MiddleName><Declension>dative</Declension></Incline></soap:Body></soap:Envelope>`
 
 	run := func(makeReq func() *http.Request) map[int]int {

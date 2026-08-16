@@ -5,7 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
 
 	"fioincline/internal/server"
 )
@@ -16,13 +18,27 @@ func main() {
 	logPath := filepath.Join(filepath.Dir(configPath), "server.log")
 
 	h := server.NewServer(cfg, logPath)
+	defer h.Close()
+
 	addr := fmt.Sprintf("%s:%d", cfg.Address, cfg.Port)
 
 	msg := fmt.Sprintf("SOAP server running at http://%s:%d/soap", cfg.Address, cfg.Port)
 	fmt.Println(msg)
 	h.Log().Log("", msg)
 
-	if err := http.ListenAndServe(addr, h); err != nil {
+	srv := &http.Server{Addr: addr, Handler: h}
+
+	// Флаш лога при Ctrl+C / завершении (иначе потеряются последние строки буфера).
+	go func() {
+		ch := make(chan os.Signal, 1)
+		signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
+		<-ch
+		h.Close()
+		os.Exit(0)
+	}()
+
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		h.Close() // log.Fatal зовёт os.Exit и обходит defer
 		log.Fatal(err)
 	}
 }

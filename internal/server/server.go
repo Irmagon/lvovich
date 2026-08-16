@@ -16,11 +16,14 @@ type Server struct {
 
 // NewServer создаёт сервер с конфигурацией и логгером.
 func NewServer(cfg Config, logPath string) *Server {
-	return &Server{cfg: cfg, log: NewLogger(logPath), core: NewCore()}
+	return &Server{cfg: cfg, log: NewLogger(logPath, cfg.LogMode, cfg.FlushMs, cfg.BufferKB), core: NewCore()}
 }
 
 // Log возвращает логгер (для сообщения при старте).
 func (s *Server) Log() *Logger { return s.log }
+
+// Close останавливает флашер логгера и сбрасывает остаток буфера на диск.
+func (s *Server) Close() { s.log.Close() }
 
 // pathMatches — соответствие express-префиксу: '/api' или '/api/...'.
 func pathMatches(p, prefix string) bool {

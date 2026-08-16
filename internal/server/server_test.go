@@ -19,7 +19,10 @@ func startServer(t *testing.T, cfg Config) string {
 	}
 	srv := &http.Server{Handler: h}
 	go srv.Serve(ln)
-	t.Cleanup(func() { _ = srv.Close() })
+	t.Cleanup(func() {
+		_ = srv.Close()
+		h.Close()
+	})
 	return "http://" + ln.Addr().String()
 }
 

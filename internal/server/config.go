@@ -14,12 +14,15 @@ type Config struct {
 	Token      string
 	AllowedIPs []string
 	Swagger    bool
+	LogMode    string
+	FlushMs    int
+	BufferKB   int
 }
 
 // ReadConfig читает config.ini так же, как оригинальный readConfig().
 // Путь — обычно корень репозитория (config.ini лежит рядом с сервером).
 func ReadConfig(path string) Config {
-	cfg := Config{Address: "0.0.0.0", Port: 3000, Swagger: true}
+	cfg := Config{Address: "0.0.0.0", Port: 3000, Swagger: true, LogMode: "async", FlushMs: 50, BufferKB: 64}
 	ini, err := os.ReadFile(path)
 	if err != nil {
 		return cfg
@@ -60,6 +63,15 @@ func ReadConfig(path string) Config {
 						cfg.AllowedIPs = append(cfg.AllowedIPs, ip)
 					}
 				}
+			}
+		case "logging":
+			switch key {
+			case "mode":
+				cfg.LogMode = val
+			case "flush_ms":
+				cfg.FlushMs, _ = strconv.Atoi(val)
+			case "buffer_kb":
+				cfg.BufferKB, _ = strconv.Atoi(val)
 			}
 		}
 	}
