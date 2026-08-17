@@ -360,33 +360,34 @@
   попытка измерить 404/403 падает с ошибкой.
 
   Результаты на AMD Ryzen 7 5700X (8 физических ядер, 16 потоков),
-  лог в режиме async. Время на одну операцию, миллисекунды.
+  лог в режиме async. Время на одну операцию, миллисекунды;
+  ~запросов/сек = 1000 / мс (пропускная способность).
 
   ВСЕ ЯДРА (16 потоков):
 
-    Бенчмарк                          ~мс/оп
-    REST /api/incline full            0.0159
-    REST /api/incline initials        0.0159
-    REST /api/gender                  0.0105
-    REST /api/city/in                 0.0086
-    SOAP Incline                      0.0251
-    Параллельно REST /api/incline     0.0060
-    Параллельно REST /api/gender      0.0041
-    Параллельно REST /api/city/in     0.0037
-    Параллельно SOAP Incline          0.0108
+    Бенчмарк                          ~мс/оп   ~запросов/сек
+    REST /api/incline full            0.0159   63000
+    REST /api/incline initials        0.0159   63000
+    REST /api/gender                  0.0105   95000
+    REST /api/city/in                 0.0086   116000
+    SOAP Incline                      0.0251   40000
+    Параллельно REST /api/incline     0.0060   167000
+    Параллельно REST /api/gender      0.0041   243000
+    Параллельно REST /api/city/in     0.0037   273000
+    Параллельно SOAP Incline          0.0108   92000
 
   ОДНО ЯДРО (1 поток):
 
-    Бенчмарк                          ~мс/оп
-    REST /api/incline full            0.0183
-    REST /api/incline initials        0.0179
-    REST /api/gender                  0.0120
-    REST /api/city/in                 0.0103
-    SOAP Incline                      0.0285
-    Параллельно REST /api/incline     0.0181
-    Параллельно REST /api/gender      0.0122
-    Параллельно REST /api/city/in     0.0108
-    Параллельно SOAP Incline          0.0287
+    Бенчмарк                          ~мс/оп   ~запросов/сек
+    REST /api/incline full            0.0183   55000
+    REST /api/incline initials        0.0179   56000
+    REST /api/gender                  0.0120   84000
+    REST /api/city/in                 0.0103   97000
+    SOAP Incline                      0.0285   35000
+    Параллельно REST /api/incline     0.0181   55000
+    Параллельно REST /api/gender      0.0122   82000
+    Параллельно REST /api/city/in     0.0108   92000
+    Параллельно SOAP Incline          0.0287   35000
 
   Для сравнения: режим sync (прямая запись на диск на каждый вызов) —
   только ~0.22 мс/оп (REST) и ~0.44 мс/оп (SOAP) — диск и мьютекс были узким
