@@ -367,14 +367,18 @@
 
     Бенчмарк                          ~мс/оп   ~запросов/сек
     REST /api/incline full            0.0159   63000
-    REST /api/incline initials        0.0159   63000
-    REST /api/gender                  0.0105   95000
-    REST /api/city/in                 0.0086   116000
-    SOAP Incline                      0.0251   40000
-    Параллельно REST /api/incline     0.0060   167000
-    Параллельно REST /api/gender      0.0041   243000
-    Параллельно REST /api/city/in     0.0037   273000
-    Параллельно SOAP Incline          0.0108   92000
+    REST /api/incline initials        0.0158   63300
+    REST /api/gender                  0.0105   95300
+    REST /api/city/in                 0.0086   116100
+    REST /api/city/from               0.0085   117100
+    REST /api/city/to                 0.0067   149500
+    SOAP Incline                      0.0253   39500
+    Параллельно REST /api/incline     0.0060   167200
+    Параллельно REST /api/gender      0.0041   244000
+    Параллельно REST /api/city/in     0.0037   273300
+    Параллельно REST /api/city/from   0.0037   271400
+    Параллельно REST /api/city/to     0.0033   306000
+    Параллельно SOAP Incline          0.0107   93500
 
   ОДНО ЯДРО (1 поток):
 
@@ -383,10 +387,14 @@
     REST /api/incline initials        0.0179   56000
     REST /api/gender                  0.0120   84000
     REST /api/city/in                 0.0103   97000
+    REST /api/city/from               0.0103   97000
+    REST /api/city/to                 0.0079   126000
     SOAP Incline                      0.0285   35000
     Параллельно REST /api/incline     0.0181   55000
     Параллельно REST /api/gender      0.0122   82000
     Параллельно REST /api/city/in     0.0108   92000
+    Параллельно REST /api/city/from   0.0102   98000
+    Параллельно REST /api/city/to     0.0083   121000
     Параллельно SOAP Incline          0.0287   35000
 
   Для сравнения: режим sync (прямая запись на диск на каждый вызов) —

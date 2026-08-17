@@ -71,6 +71,16 @@ func BenchmarkRestCityIn(b *testing.B) {
 		`{"name":"Москва","gender":"female"}`)
 }
 
+func BenchmarkRestCityFrom(b *testing.B) {
+	benchReq(b, benchServer(b), http.MethodPost, "/api/city/from", "application/json",
+		`{"name":"Москва","gender":"female"}`)
+}
+
+func BenchmarkRestCityTo(b *testing.B) {
+	benchReq(b, benchServer(b), http.MethodPost, "/api/city/to", "application/json",
+		`{"name":"Москва"}`)
+}
+
 func BenchmarkSoapIncline(b *testing.B) {
 	const soapBody = `<?xml version="1.0" encoding="UTF-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><Incline xmlns="urn:LvovichService"><LastName>Иванов</LastName><FirstName>Иван</FirstName><MiddleName>Иванович</MiddleName><Declension>dative</Declension></Incline></soap:Body></soap:Envelope>`
 	benchReq(b, benchServer(b), http.MethodPost, "/soap", "text/xml", soapBody)
@@ -152,6 +162,16 @@ func BenchmarkParallelRestGender(b *testing.B) {
 func BenchmarkParallelRestCityIn(b *testing.B) {
 	benchReqParallel(b, benchServer(b), http.MethodPost, "/api/city/in", "application/json",
 		`{"name":"Москва","gender":"female"}`)
+}
+
+func BenchmarkParallelRestCityFrom(b *testing.B) {
+	benchReqParallel(b, benchServer(b), http.MethodPost, "/api/city/from", "application/json",
+		`{"name":"Москва","gender":"female"}`)
+}
+
+func BenchmarkParallelRestCityTo(b *testing.B) {
+	benchReqParallel(b, benchServer(b), http.MethodPost, "/api/city/to", "application/json",
+		`{"name":"Москва"}`)
 }
 
 func BenchmarkParallelSoapIncline(b *testing.B) {
