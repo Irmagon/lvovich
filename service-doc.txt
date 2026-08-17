@@ -364,56 +364,61 @@
   Запись в лог (async по умолчанию, если не BenchmarkNoLog*). Бенчмарки
   проверяют статус ответа (200), попытка измерить 404/403 падает с ошибкой.
 
+  Правила таблиц ниже:
+    - ВСЕ ЯДРА — только параллельные запросы (b.RunParallel), все методы;
+    - ОДНО ЯДРО — только последовательные запросы, все методы;
+    - для каждого режима приведены результаты с включённым и отключённым
+      логированием.
+
   Результаты на AMD Ryzen 7 5700X (8 физических ядер, 16 потоков).
   Время на одну операцию, миллисекунды; ~запросов/сек = 1000 / мс.
 
-  ВСЕ ЯДРА (16 потоков), лог вкл (async):
+  ВСЕ ЯДРА (16 потоков), параллельные запросы, лог вкл (async):
 
     Бенчмарк                          ~мс/оп   ~запросов/сек
-    REST /api/incline full            0.0163   61300
-    REST /api/incline initials        0.0164   61000
-    REST /api/gender                  0.0107   93700
-    REST /api/city/in                 0.0087   114800
-    REST /api/city/from               0.0087   114600
-    REST /api/city/to                 0.0068   146900
-    SOAP Incline                      0.0260   38400
-    Параллельно REST /api/incline     0.0064   156600
-    Параллельно REST /api/gender      0.0042   237800
-    Параллельно REST /api/city/in     0.0038   263400
-    Параллельно REST /api/city/from   0.0038   266400
-    Параллельно REST /api/city/to     0.0033   302000
-    Параллельно SOAP Incline          0.0111   90100
+    REST /api/incline full            0.0060   167300
+    REST /api/incline initials        0.0061   163300
+    REST /api/gender                  0.0042   241000
+    REST /api/city/in                 0.0037   273000
+    REST /api/city/from               0.0037   272500
+    REST /api/city/to                 0.0033   304000
+    SOAP Incline                      0.0110   91000
 
-  ВСЕ ЯДРА (16 потоков), лог ОТКЛ (enabled=false):
+  ВСЕ ЯДРА (16 потоков), параллельные запросы, лог ОТКЛ (enabled=false):
 
     Бенчмарк                          ~мс/оп   ~запросов/сек
-    REST /api/incline full            0.0119   83700
-    REST /api/gender                  0.0076   131900
-    REST /api/city/to                 0.0044   227700
-    SOAP Incline                      0.0198   50400
-    Параллельно REST /api/gender      0.0028   352600
-    Параллельно REST /api/city/to     0.0023   434800
-    Параллельно SOAP Incline          0.0083   120500
+    REST /api/incline full            0.0045   221400
+    REST /api/incline initials        0.0042   235700
+    REST /api/gender                  0.0028   351600
+    REST /api/city/in                 0.0026   386600
+    REST /api/city/from               0.0025   393500
+    REST /api/city/to                 0.0022   455000
+    SOAP Incline                      0.0087   115500
 
-  ОДНО ЯДРО (1 поток), лог вкл (async):
+  ОДНО ЯДРО (1 поток), последовательные запросы, лог вкл (async):
 
     Бенчмарк                          ~мс/оп   ~запросов/сек
-    REST /api/incline full            0.0183   55000
-    REST /api/incline initials        0.0179   56000
-    REST /api/gender                  0.0120   84000
-    REST /api/city/in                 0.0103   97000
-    REST /api/city/from               0.0103   97000
-    REST /api/city/to                 0.0079   126000
-    SOAP Incline                      0.0285   35000
-    Параллельно REST /api/incline     0.0181   55000
-    Параллельно REST /api/gender      0.0122   82000
-    Параллельно REST /api/city/in     0.0108   92000
-    Параллельно REST /api/city/from   0.0102   98000
-    Параллельно REST /api/city/to     0.0083   121000
-    Параллельно SOAP Incline          0.0287   35000
+    REST /api/incline full            0.0179   55900
+    REST /api/incline initials        0.0177   56400
+    REST /api/gender                  0.0118   84400
+    REST /api/city/in                 0.0100   99600
+    REST /api/city/from               0.0103   97500
+    REST /api/city/to                 0.0079   126300
+    SOAP Incline                      0.0305   32800
 
-  Отключение логирования (enabled=false) ускоряет обработку примерно на 30%
-  (с 0.0033 до 0.0023 мс/оп для параллельного city/to) за счёт отказа от
+  ОДНО ЯДРО (1 поток), последовательные запросы, лог ОТКЛ (enabled=false):
+
+    Бенчмарк                          ~мс/оп   ~запросов/сек
+    REST /api/incline full            0.0128   78300
+    REST /api/incline initials        0.0123   81500
+    REST /api/gender                  0.0082   121700
+    REST /api/city/in                 0.0066   151700
+    REST /api/city/from               0.0065   153400
+    REST /api/city/to                 0.0051   197600
+    SOAP Incline                      0.0218   45900
+
+  Отключение логирования (enabled=false) ускоряет обработку примерно на 30–50%
+  (с 0.0033 до 0.0022 мс/оп для параллельного city/to) за счёт отказа от
   буферизации и фонового сброса на диск, а также от формирования строк лога.
 
   Для сравнения: режим sync (прямая запись на диск на каждый вызов) —

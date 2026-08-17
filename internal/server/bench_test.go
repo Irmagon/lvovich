@@ -161,6 +161,11 @@ func BenchmarkParallelRestInclineFull(b *testing.B) {
 		`{"SurName":"Иванов","FirstName":"Иван","SecondName":"Иванович","declension":"dative"}`)
 }
 
+func BenchmarkParallelRestInclineInitials(b *testing.B) {
+	benchReqParallel(b, benchServer(b), http.MethodPost, "/api/incline", "application/json",
+		`{"SurName":"Петров","FirstName":"Пётр","SecondName":"Петрович","declension":"genitive","format":"initials"}`)
+}
+
 func BenchmarkParallelRestGender(b *testing.B) {
 	benchReqParallel(b, benchServer(b), http.MethodPost, "/api/gender", "application/json",
 		`{"SurName":"Смирнова","FirstName":"Анна"}`)
@@ -194,9 +199,24 @@ func BenchmarkNoLogRestInclineFull(b *testing.B) {
 		`{"SurName":"Иванов","FirstName":"Иван","SecondName":"Иванович","declension":"dative"}`)
 }
 
+func BenchmarkNoLogRestInclineInitials(b *testing.B) {
+	benchReq(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/incline", "application/json",
+		`{"SurName":"Петров","FirstName":"Пётр","SecondName":"Петрович","declension":"genitive","format":"initials"}`)
+}
+
 func BenchmarkNoLogRestGender(b *testing.B) {
 	benchReq(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/gender", "application/json",
 		`{"SurName":"Смирнова","FirstName":"Анна"}`)
+}
+
+func BenchmarkNoLogRestCityIn(b *testing.B) {
+	benchReq(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/city/in", "application/json",
+		`{"name":"Москва","gender":"female"}`)
+}
+
+func BenchmarkNoLogRestCityFrom(b *testing.B) {
+	benchReq(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/city/from", "application/json",
+		`{"name":"Москва","gender":"female"}`)
 }
 
 func BenchmarkNoLogRestCityTo(b *testing.B) {
@@ -209,9 +229,29 @@ func BenchmarkNoLogSoapIncline(b *testing.B) {
 	benchReq(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/soap", "text/xml", soapBody)
 }
 
+func BenchmarkNoLogParallelRestInclineFull(b *testing.B) {
+	benchReqParallel(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/incline", "application/json",
+		`{"SurName":"Иванов","FirstName":"Иван","SecondName":"Иванович","declension":"dative"}`)
+}
+
+func BenchmarkNoLogParallelRestInclineInitials(b *testing.B) {
+	benchReqParallel(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/incline", "application/json",
+		`{"SurName":"Петров","FirstName":"Пётр","SecondName":"Петрович","declension":"genitive","format":"initials"}`)
+}
+
 func BenchmarkNoLogParallelRestGender(b *testing.B) {
 	benchReqParallel(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/gender", "application/json",
 		`{"SurName":"Смирнова","FirstName":"Анна"}`)
+}
+
+func BenchmarkNoLogParallelRestCityIn(b *testing.B) {
+	benchReqParallel(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/city/in", "application/json",
+		`{"name":"Москва","gender":"female"}`)
+}
+
+func BenchmarkNoLogParallelRestCityFrom(b *testing.B) {
+	benchReqParallel(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/city/from", "application/json",
+		`{"name":"Москва","gender":"female"}`)
 }
 
 func BenchmarkNoLogParallelRestCityTo(b *testing.B) {
