@@ -1,6 +1,7 @@
 package lvovich
 
-// Правила склонения отчеств (порт inclineRulesMiddlename.ts).
+// Правила склонения отчеств — порт inclineRulesMiddlename.ts
+// библиотеки nodkz/lvovich (https://github.com/nodkz/lvovich), MIT.
 // Порядок правил важен: первое совпадение выигрывает.
 
 var middlenameRules = &RuleSet{

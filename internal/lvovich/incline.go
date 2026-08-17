@@ -1,3 +1,5 @@
+// Склонение ФИО — порт index.ts
+// библиотеки nodkz/lvovich (https://github.com/nodkz/lvovich), MIT.
 package lvovich
 
 import (

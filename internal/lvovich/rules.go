@@ -1,3 +1,5 @@
+// Движок склонения по правилам — порт inclineRules.ts
+// библиотеки nodkz/lvovich (https://github.com/nodkz/lvovich), MIT.
 package lvovich
 
 import (

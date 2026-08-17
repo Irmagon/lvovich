@@ -1,6 +1,7 @@
 package lvovich
 
-// Правила склонения городов (порт cityRules.ts).
+// Правила склонения городов — порт cityRules.ts
+// библиотеки nodkz/lvovich (https://github.com/nodkz/lvovich), MIT.
 // Все правила без пола (Androgynous — подходит для любого пола).
 // Порядок правил важен: первое совпадение выигрывает.
 

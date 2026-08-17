@@ -1,3 +1,5 @@
+// Определение пола — порт gender.ts
+// библиотеки nodkz/lvovich (https://github.com/nodkz/lvovich), MIT.
 package lvovich
 
 import "strings"

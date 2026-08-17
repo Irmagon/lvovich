@@ -1,3 +1,5 @@
+// Константы пола и их разбор — соответствуют оригинальной библиотеке
+// nodkz/lvovich (https://github.com/nodkz/lvovich), MIT.
 package lvovich
 
 // GenderConst — числовое представление пола.

@@ -1,6 +1,7 @@
 package lvovich
 
-// Правила склонения фамилий (порт inclineRulesLastname.ts).
+// Правила склонения фамилий — порт inclineRulesLastname.ts
+// библиотеки nodkz/lvovich (https://github.com/nodkz/lvovich), MIT.
 // Порядок правил важен: первое совпадение выигрывает.
 
 var lastnameRules = &RuleSet{

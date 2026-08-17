@@ -1,3 +1,5 @@
+// Склонение городов — порт city.ts
+// библиотеки nodkz/lvovich (https://github.com/nodkz/lvovich), MIT.
 package lvovich
 
 import (

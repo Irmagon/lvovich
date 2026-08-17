@@ -1,6 +1,7 @@
 package lvovich
 
-// genderDataSource — правила определения пола (порт genderRules.ts).
+// genderDataSource — правила определения пола (порт genderRules.ts
+// библиотеки nodkz/lvovich, https://github.com/nodkz/lvovich, MIT).
 
 type genderRulesData struct {
 	Lastname   *GenderRuleSet
