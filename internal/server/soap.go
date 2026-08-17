@@ -17,6 +17,15 @@ type soapNode struct {
 	text     string
 }
 
+// logSoap пишет строку лога SOAP-операции. При отключённом логировании
+// (Enabled()==false) args не сериализуется и модуль логирования не вызывается.
+func (s *Server) logSoap(op string, args *soapNode) {
+	if !s.log.Enabled() {
+		return
+	}
+	s.log.Log("", op+" - "+soapArgsJSON(args))
+}
+
 // parseSoapDoc разбирает SOAP-конверт: операция = первый элемент внутри soap:Body.
 func parseSoapDoc(body []byte) (op string, opEl *soapNode, err error) {
 	if len(strings.TrimSpace(string(body))) == 0 {
@@ -159,7 +168,7 @@ func (s *Server) soapCall(w http.ResponseWriter, op string, opEl *soapNode) {
 }
 
 func (s *Server) soapIncline(w http.ResponseWriter, opEl *soapNode, args *soapNode) {
-	s.log.Log("", "SOAP Incline - "+soapArgsJSON(args))
+	s.logSoap("SOAP Incline", args)
 
 	var lastName, firstName, middleName, decl, format string
 	if args != nil {
@@ -195,7 +204,7 @@ func (s *Server) soapIncline(w http.ResponseWriter, opEl *soapNode, args *soapNo
 }
 
 func (s *Server) soapGetGender(w http.ResponseWriter, opEl *soapNode, args *soapNode) {
-	s.log.Log("", "SOAP GetGender - "+soapArgsJSON(args))
+	s.logSoap("SOAP GetGender", args)
 
 	var lastName, firstName, middleName string
 	if args == nil {
@@ -211,7 +220,7 @@ func (s *Server) soapGetGender(w http.ResponseWriter, opEl *soapNode, args *soap
 }
 
 func (s *Server) soapCity(w http.ResponseWriter, opEl *soapNode, args *soapNode, op string) {
-	s.log.Log("", "SOAP "+op+" - "+soapArgsJSON(args))
+	s.logSoap("SOAP "+op, args)
 
 	respEl := op + "Response"
 	name, present := "", false

@@ -84,6 +84,13 @@ func (l *Logger) SetLastIP(ip string) {
 	l.mu.Unlock()
 }
 
+// Enabled сообщает, ведётся ли запись лога (enabled в конфиге).
+// Позволяет вызывающей стороне полностью пропустить подготовку строки лога,
+// когда логирование отключено.
+func (l *Logger) Enabled() bool {
+	return l.enabled
+}
+
 // Log пишет строку с IP последнего запроса (или '-').
 // Если логгер отключён (enabled=false) — вызов не делает ничего.
 func (l *Logger) Log(ip, msg string) {

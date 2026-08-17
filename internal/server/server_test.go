@@ -4,6 +4,8 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -355,5 +357,38 @@ func TestSwaggerDisabled(t *testing.T) {
 	r := doReq(t, "GET", base+"/api-docs", map[string]string{"Authorization": authHdr}, "")
 	if r.status != 404 {
 		t.Errorf("apidocs disabled status=%d", r.status)
+	}
+}
+
+// TestLoggingDisabledNoLogFile проверяет, что при Logging=false запросы
+// обрабатываются корректно, а файл лога вообще не создаётся (модуль логирования
+// не задействуется в горячем пути).
+func TestLoggingDisabledNoLogFile(t *testing.T) {
+	cfg := testCfg()
+	cfg.Logging = false
+	dir := t.TempDir()
+	logPath := filepath.Join(dir, "server.log")
+
+	h := NewServer(cfg, logPath)
+	defer h.Close()
+
+	req, err := http.NewRequest(http.MethodPost, "/api/gender", strings.NewReader(`{"SurName":"Смирнова","FirstName":"Анна"}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.RequestURI = "/api/gender"
+	req.RemoteAddr = "127.0.0.1:0"
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", authHdr)
+
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status=%d", rr.Code)
+	}
+
+	h.Close()
+	if _, err := os.Stat(logPath); !os.IsNotExist(err) {
+		t.Fatalf("при отключённом логировании файл лога не должен создаваться: %v", err)
 	}
 }

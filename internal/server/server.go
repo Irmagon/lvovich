@@ -61,6 +61,20 @@ func rawPath(r *http.Request) string {
 	return raw
 }
 
+// logAccess пишет строку лога доступа. При отключённом логировании
+// (Enabled()==false) строка вообще не формируется и модуль логирования
+// не вызывается.
+func (s *Server) logAccess(ip string, r *http.Request, prefix ...string) {
+	if !s.log.Enabled() {
+		return
+	}
+	pre := ""
+	if len(prefix) > 0 {
+		pre = prefix[0] + " "
+	}
+	s.log.Log(ip, fmt.Sprintf("%s%s %s - %s", pre, r.Method, r.RequestURI, bodyLogText(r)))
+}
+
 // ServeHTTP разбирает, логирует, применяет whitelist+auth и маршрутизирует.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	bi, handled := s.parseBody(w, r)
@@ -73,11 +87,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	path := rawPath(r)
 	ip := clientIP(r)
-	s.log.Log(ip, fmt.Sprintf("%s %s - %s", r.Method, r.RequestURI, bodyLogText(r)))
+	s.logAccess(ip, r)
 
 	if pathMatches(path, "/api") || pathMatches(path, "/soap") {
 		if !s.ipAllowed(ip) {
-			s.log.Log(ip, "blocked IP "+ip)
+			s.logAccess(ip, r, "blocked IP "+ip)
 			sendJSON(w, r, http.StatusForbidden, `{"error":"Forbidden"}`)
 			return
 		}
