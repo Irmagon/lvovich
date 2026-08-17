@@ -94,6 +94,13 @@ func syncCfg() Config {
 	return c
 }
 
+// noLogCfg — конфиг с полностью отключённым логированием (Logging=false).
+func noLogCfg() Config {
+	c := testCfg()
+	c.Logging = false
+	return c
+}
+
 func BenchmarkSyncRestInclineFull(b *testing.B) {
 	benchReq(b, benchServerCfg(b, syncCfg()), http.MethodPost, "/api/incline", "application/json",
 		`{"SurName":"Иванов","FirstName":"Иван","SecondName":"Иванович","declension":"dative"}`)
@@ -177,4 +184,42 @@ func BenchmarkParallelRestCityTo(b *testing.B) {
 func BenchmarkParallelSoapIncline(b *testing.B) {
 	const soapBody = `<?xml version="1.0" encoding="UTF-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><Incline xmlns="urn:LvovichService"><LastName>Иванов</LastName><FirstName>Иван</FirstName><MiddleName>Иванович</MiddleName><Declension>dative</Declension></Incline></soap:Body></soap:Envelope>`
 	benchReqParallel(b, benchServer(b), http.MethodPost, "/soap", "text/xml", soapBody)
+}
+
+// Бенчмарки с полностью отключённым логированием (Logging=false).
+// Показывают чистое ядро склонения без затрат на сборку и буферизацию лога.
+
+func BenchmarkNoLogRestInclineFull(b *testing.B) {
+	benchReq(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/incline", "application/json",
+		`{"SurName":"Иванов","FirstName":"Иван","SecondName":"Иванович","declension":"dative"}`)
+}
+
+func BenchmarkNoLogRestGender(b *testing.B) {
+	benchReq(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/gender", "application/json",
+		`{"SurName":"Смирнова","FirstName":"Анна"}`)
+}
+
+func BenchmarkNoLogRestCityTo(b *testing.B) {
+	benchReq(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/city/to", "application/json",
+		`{"name":"Москва"}`)
+}
+
+func BenchmarkNoLogSoapIncline(b *testing.B) {
+	const soapBody = `<?xml version="1.0" encoding="UTF-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><Incline xmlns="urn:LvovichService"><LastName>Иванов</LastName><FirstName>Иван</FirstName><MiddleName>Иванович</MiddleName><Declension>dative</Declension></Incline></soap:Body></soap:Envelope>`
+	benchReq(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/soap", "text/xml", soapBody)
+}
+
+func BenchmarkNoLogParallelRestGender(b *testing.B) {
+	benchReqParallel(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/gender", "application/json",
+		`{"SurName":"Смирнова","FirstName":"Анна"}`)
+}
+
+func BenchmarkNoLogParallelRestCityTo(b *testing.B) {
+	benchReqParallel(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/city/to", "application/json",
+		`{"name":"Москва"}`)
+}
+
+func BenchmarkNoLogParallelSoapIncline(b *testing.B) {
+	const soapBody = `<?xml version="1.0" encoding="UTF-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><Incline xmlns="urn:LvovichService"><LastName>Иванов</LastName><FirstName>Иван</FirstName><MiddleName>Иванович</MiddleName><Declension>dative</Declension></Incline></soap:Body></soap:Envelope>`
+	benchReqParallel(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/soap", "text/xml", soapBody)
 }

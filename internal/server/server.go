@@ -15,8 +15,9 @@ type Server struct {
 }
 
 // NewServer создаёт сервер с конфигурацией и логгером.
+// Если cfg.Logging=false, логгер создаётся отключённым (запись в файл не ведётся).
 func NewServer(cfg Config, logPath string) *Server {
-	return &Server{cfg: cfg, log: NewLogger(logPath, cfg.LogMode, cfg.FlushMs, cfg.BufferKB), core: NewCore()}
+	return &Server{cfg: cfg, log: NewLogger(logPath, cfg.LogMode, cfg.FlushMs, cfg.BufferKB, cfg.Logging), core: NewCore()}
 }
 
 // Log возвращает логгер (для сообщения при старте).

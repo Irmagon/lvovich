@@ -30,6 +30,7 @@ type Logger struct {
 	mode    string
 	flushMs time.Duration
 	maxBuf  int
+	enabled bool
 
 	mu      sync.Mutex
 	lastIP  string
@@ -45,7 +46,8 @@ type Logger struct {
 // NewLogger создаёт логгер с указанным файлом (обычно server.log в корне репо).
 // mode: "async" (по умолчанию) или "sync". flushMs — интервал флаша,
 // bufferKB — порог объёма буфера (КБ) для внепланового флаша.
-func NewLogger(path, mode string, flushMs, bufferKB int) *Logger {
+// enabled=false полностью отключает запись в файл.
+func NewLogger(path, mode string, flushMs, bufferKB int, enabled ...bool) *Logger {
 	if mode != "sync" {
 		mode = "async"
 	}
@@ -55,15 +57,20 @@ func NewLogger(path, mode string, flushMs, bufferKB int) *Logger {
 	if bufferKB <= 0 {
 		bufferKB = 64
 	}
+	on := true
+	if len(enabled) > 0 {
+		on = enabled[0]
+	}
 	l := &Logger{
 		path:    path,
 		mode:    mode,
 		flushMs: time.Duration(flushMs) * time.Millisecond,
 		maxBuf:  bufferKB * 1024,
+		enabled: on,
 		stopCh:  make(chan struct{}),
 		doneCh:  make(chan struct{}),
 	}
-	if mode == "async" {
+	if mode == "async" && on {
 		l.started = true
 		go l.flusher()
 	}
@@ -78,7 +85,11 @@ func (l *Logger) SetLastIP(ip string) {
 }
 
 // Log пишет строку с IP последнего запроса (или '-').
+// Если логгер отключён (enabled=false) — вызов не делает ничего.
 func (l *Logger) Log(ip, msg string) {
+	if !l.enabled {
+		return
+	}
 	ln := logLine{
 		ts:   nowStamp(),
 		addr: "-",
@@ -150,6 +161,9 @@ func (l *Logger) flusher() {
 // Close останавливает флашер и сбрасывает остаток буфера на диск.
 // Дальнейшие вызовы Log() пишут синхронно (best-effort).
 func (l *Logger) Close() {
+	if !l.enabled {
+		return
+	}
 	l.mu.Lock()
 	if l.stopped {
 		l.mu.Unlock()

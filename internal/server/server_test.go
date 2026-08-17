@@ -55,7 +55,7 @@ func doReq(t *testing.T, method, url string, headers map[string]string, body str
 const authHdr = "Bearer testtoken999"
 
 func testCfg() Config {
-	return Config{Address: "127.0.0.1", Port: 0, Token: "testtoken999", AllowedIPs: []string{"127.0.0.1", "::1"}, Swagger: true}
+	return Config{Address: "127.0.0.1", Port: 0, Token: "testtoken999", AllowedIPs: []string{"127.0.0.1", "::1"}, Swagger: true, Logging: true, LogMode: "async", FlushMs: 50, BufferKB: 64}
 }
 
 func TestRestInclineFull(t *testing.T) {

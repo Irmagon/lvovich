@@ -94,6 +94,23 @@ func TestLoggerLastIPFallback(t *testing.T) {
 	}
 }
 
+func TestLoggerDisabledWritesNothing(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "server.log")
+	// enabled=false — логгер не должен создавать файл и писать в него.
+	l := NewLogger(path, "async", 20, 64, false)
+	l.Log("127.0.0.1", "GET /api/incline - {}")
+	l.Log("", "SOAP Incline - null")
+	l.Close()
+
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		t.Fatalf("отключённый логгер не должен создавать файл: %v", err)
+	}
+	if got := readLog(t, path); got != "" {
+		t.Fatalf("лог не должен быть пустым при отключённом логировании: %q", got)
+	}
+}
+
 func TestLoggerBufferThresholdFlush(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "server.log")
