@@ -94,6 +94,51 @@
           </xsd:sequence>
         </xsd:complexType>
       </xsd:element>
+
+      <xsd:element name="OrgIn">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="Name" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="OrgInResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="Name" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="OrgFrom">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="Name" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="OrgFromResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="Name" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="OrgTo">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="Name" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="OrgToResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="Name" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
     </xsd:schema>
   </wsdl:types>
 
@@ -132,6 +177,27 @@
     <wsdl:part name="parameters" element="tns:CityToResponse"/>
   </wsdl:message>
 
+  <wsdl:message name="OrgInInput">
+    <wsdl:part name="parameters" element="tns:OrgIn"/>
+  </wsdl:message>
+  <wsdl:message name="OrgInOutput">
+    <wsdl:part name="parameters" element="tns:OrgInResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="OrgFromInput">
+    <wsdl:part name="parameters" element="tns:OrgFrom"/>
+  </wsdl:message>
+  <wsdl:message name="OrgFromOutput">
+    <wsdl:part name="parameters" element="tns:OrgFromResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="OrgToInput">
+    <wsdl:part name="parameters" element="tns:OrgTo"/>
+  </wsdl:message>
+  <wsdl:message name="OrgToOutput">
+    <wsdl:part name="parameters" element="tns:OrgToResponse"/>
+  </wsdl:message>
+
   <wsdl:portType name="LvovichPortType">
     <wsdl:operation name="Incline">
       <wsdl:input message="tns:InclineInput"/>
@@ -152,6 +218,18 @@
     <wsdl:operation name="CityTo">
       <wsdl:input message="tns:CityToInput"/>
       <wsdl:output message="tns:CityToOutput"/>
+    </wsdl:operation>
+    <wsdl:operation name="OrgIn">
+      <wsdl:input message="tns:OrgInInput"/>
+      <wsdl:output message="tns:OrgInOutput"/>
+    </wsdl:operation>
+    <wsdl:operation name="OrgFrom">
+      <wsdl:input message="tns:OrgFromInput"/>
+      <wsdl:output message="tns:OrgFromOutput"/>
+    </wsdl:operation>
+    <wsdl:operation name="OrgTo">
+      <wsdl:input message="tns:OrgToInput"/>
+      <wsdl:output message="tns:OrgToOutput"/>
     </wsdl:operation>
   </wsdl:portType>
 
@@ -179,6 +257,21 @@
     </wsdl:operation>
     <wsdl:operation name="CityTo">
       <soap:operation soapAction="urn:CityTo"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OrgIn">
+      <soap:operation soapAction="urn:OrgIn"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OrgFrom">
+      <soap:operation soapAction="urn:OrgFrom"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OrgTo">
+      <soap:operation soapAction="urn:OrgTo"/>
       <wsdl:input><soap:body use="literal"/></wsdl:input>
       <wsdl:output><soap:body use="literal"/></wsdl:output>
     </wsdl:operation>

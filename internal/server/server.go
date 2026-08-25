@@ -137,6 +137,15 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case path == "/api/city/to" && r.Method == http.MethodPost:
 		s.handleRestCity(w, r, "to")
 		return
+	case path == "/api/org/in" && r.Method == http.MethodPost:
+		s.handleRestOrg(w, r, "in")
+		return
+	case path == "/api/org/from" && r.Method == http.MethodPost:
+		s.handleRestOrg(w, r, "from")
+		return
+	case path == "/api/org/to" && r.Method == http.MethodPost:
+		s.handleRestOrg(w, r, "to")
+		return
 	}
 
 	if s.cfg.Swagger && r.Method == http.MethodGet {

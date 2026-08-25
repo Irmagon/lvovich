@@ -11,7 +11,7 @@ window.onload = function() {
   "swaggerDoc": {
     "openapi": "3.0.3",
     "info": {
-      "title": "Lvovich — склонение русских ФИО и городов",
+      "title": "Lvovich — склонение русских ФИО, городов и организаций",
       "version": "1.0.0",
       "description": "REST-обёртка над SOAP-сервисом. Для SOAP используйте `/soap`, WSDL — `/wsdl`."
     },
@@ -264,6 +264,129 @@ window.onload = function() {
           "responses": {
             "200": {
               "description": "Город в винительном падеже",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/org/in": {
+        "post": {
+          "summary": "Организация в предложном падеже (в какой?)",
+          "tags": [
+            "Организации"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "ООО «Ромашка»"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Организация в предложном падеже",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/org/from": {
+        "post": {
+          "summary": "Организация в родительном падеже (из какой?)",
+          "tags": [
+            "Организации"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "ООО «Ромашка»"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Организация в родительном падеже",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/org/to": {
+        "post": {
+          "summary": "Организация в винительном падеже (в какую?)",
+          "tags": [
+            "Организации"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "ООО «Ромашка»"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Организация в винительном падеже",
               "content": {
                 "application/json": {
                   "schema": {

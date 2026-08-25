@@ -38,3 +38,18 @@ func (c *Core) CityFrom(name, gender string) string {
 func (c *Core) CityTo(name string) string {
 	return lvovich.CityTo(name)
 }
+
+// OrgIn — организация в предложном падеже.
+func (c *Core) OrgIn(name string) string {
+	return lvovich.OrgIn(name)
+}
+
+// OrgFrom — организация в родительном падеже.
+func (c *Core) OrgFrom(name string) string {
+	return lvovich.OrgFrom(name)
+}
+
+// OrgTo — организация в винительном падеже.
+func (c *Core) OrgTo(name string) string {
+	return lvovich.OrgTo(name)
+}

@@ -102,13 +102,16 @@ func findBody(n *soapNode) *soapNode {
 
 // soapOps — известные операции.
 var soapOps = map[string]bool{
-	"Incline": true, "GetGender": true, "CityIn": true, "CityFrom": true, "CityTo": true,
+	"Incline": true, "GetGender": true,
+	"CityIn": true, "CityFrom": true, "CityTo": true,
+	"OrgIn": true, "OrgFrom": true, "OrgTo": true,
 }
 
 // soapActions — SOAPAction -> операция (из WSDL-binding).
 var soapActions = map[string]string{
 	"urn:Incline": "Incline", "urn:GetGender": "GetGender",
 	"urn:CityIn": "CityIn", "urn:CityFrom": "CityFrom", "urn:CityTo": "CityTo",
+	"urn:OrgIn": "OrgIn", "urn:OrgFrom": "OrgFrom", "urn:OrgTo": "OrgTo",
 }
 
 // handleSoap — POST /soap.
@@ -162,8 +165,10 @@ func (s *Server) soapCall(w http.ResponseWriter, op string, opEl *soapNode) {
 		s.soapIncline(w, opEl, args)
 	case "GetGender":
 		s.soapGetGender(w, opEl, args)
-	default: // CityIn, CityFrom, CityTo
+	case "CityIn", "CityFrom", "CityTo":
 		s.soapCity(w, opEl, args, op)
+	default: // OrgIn, OrgFrom, OrgTo
+		s.soapOrg(w, opEl, args, op)
 	}
 }
 
@@ -243,6 +248,33 @@ func (s *Server) soapCity(w http.ResponseWriter, opEl *soapNode, args *soapNode,
 		out = s.core.CityFrom(name, gender)
 	default:
 		out = s.core.CityTo(name)
+	}
+	s.soapResponse(w, respEl, appendIf(nil, "Name", out))
+}
+
+func (s *Server) soapOrg(w http.ResponseWriter, opEl *soapNode, args *soapNode, op string) {
+	s.logSoap("SOAP "+op, args)
+
+	respEl := op + "Response"
+	name, present := "", false
+	if args != nil {
+		name, present = soapGetStringChecked(args, "Name")
+	} else {
+		s.soapFieldFault(w, respEl, fmt.Errorf("Cannot read properties of null (reading 'Name')"))
+		return
+	}
+	if !present {
+		s.soapFieldFault(w, respEl, fmt.Errorf("Cannot read properties of undefined (reading 'toLowerCase')"))
+		return
+	}
+	var out string
+	switch op {
+	case "OrgIn":
+		out = s.core.OrgIn(name)
+	case "OrgFrom":
+		out = s.core.OrgFrom(name)
+	default:
+		out = s.core.OrgTo(name)
 	}
 	s.soapResponse(w, respEl, appendIf(nil, "Name", out))
 }

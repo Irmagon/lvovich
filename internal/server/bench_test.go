@@ -263,3 +263,65 @@ func BenchmarkNoLogParallelSoapIncline(b *testing.B) {
 	const soapBody = `<?xml version="1.0" encoding="UTF-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><Incline xmlns="urn:LvovichService"><LastName>Иванов</LastName><FirstName>Иван</FirstName><MiddleName>Иванович</MiddleName><Declension>dative</Declension></Incline></soap:Body></soap:Envelope>`
 	benchReqParallel(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/soap", "text/xml", soapBody)
 }
+
+// Бенчмарки склонения организаций (REST).
+
+func BenchmarkRestOrgIn(b *testing.B) {
+	benchReq(b, benchServer(b), http.MethodPost, "/api/org/in", "application/json",
+		`{"name":"ООО «Ромашка»"}`)
+}
+
+func BenchmarkRestOrgFrom(b *testing.B) {
+	benchReq(b, benchServer(b), http.MethodPost, "/api/org/from", "application/json",
+		`{"name":"ООО «Ромашка»"}`)
+}
+
+func BenchmarkRestOrgTo(b *testing.B) {
+	benchReq(b, benchServer(b), http.MethodPost, "/api/org/to", "application/json",
+		`{"name":"ООО «Ромашка»"}`)
+}
+
+func BenchmarkParallelRestOrgIn(b *testing.B) {
+	benchReqParallel(b, benchServer(b), http.MethodPost, "/api/org/in", "application/json",
+		`{"name":"ООО «Ромашка»"}`)
+}
+
+func BenchmarkParallelRestOrgFrom(b *testing.B) {
+	benchReqParallel(b, benchServer(b), http.MethodPost, "/api/org/from", "application/json",
+		`{"name":"ООО «Ромашка»"}`)
+}
+
+func BenchmarkParallelRestOrgTo(b *testing.B) {
+	benchReqParallel(b, benchServer(b), http.MethodPost, "/api/org/to", "application/json",
+		`{"name":"ООО «Ромашка»"}`)
+}
+
+func BenchmarkNoLogRestOrgIn(b *testing.B) {
+	benchReq(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/org/in", "application/json",
+		`{"name":"ООО «Ромашка»"}`)
+}
+
+func BenchmarkNoLogRestOrgFrom(b *testing.B) {
+	benchReq(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/org/from", "application/json",
+		`{"name":"ООО «Ромашка»"}`)
+}
+
+func BenchmarkNoLogRestOrgTo(b *testing.B) {
+	benchReq(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/org/to", "application/json",
+		`{"name":"ООО «Ромашка»"}`)
+}
+
+func BenchmarkNoLogParallelRestOrgIn(b *testing.B) {
+	benchReqParallel(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/org/in", "application/json",
+		`{"name":"ООО «Ромашка»"}`)
+}
+
+func BenchmarkNoLogParallelRestOrgFrom(b *testing.B) {
+	benchReqParallel(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/org/from", "application/json",
+		`{"name":"ООО «Ромашка»"}`)
+}
+
+func BenchmarkNoLogParallelRestOrgTo(b *testing.B) {
+	benchReqParallel(b, benchServerCfg(b, noLogCfg()), http.MethodPost, "/api/org/to", "application/json",
+		`{"name":"ООО «Ромашка»"}`)
+}

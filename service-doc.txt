@@ -1,5 +1,5 @@
-================================================================================
-  Lvovich — склонение русских ФИО и городов
+﻿================================================================================
+  Lvovich — склонение русских ФИО, городов и организаций
 ================================================================================
 
   SOAP:        http://localhost:3000/soap
@@ -132,7 +132,29 @@
   POST /api/city/to — город в винительном падеже (в какой?)
   --------------------------------------------------------------------------------
     Body (JSON): {"name":"Москва"}
-    Ответ:       {"name":"Москву"}
+Ответ:       {"name":"Москву"}
+
+
+  POST /api/org/in — организация в предложном падеже (в какой?)
+  --------------------------------------------------------------------------------
+    Body (JSON): {"name":"ООО «Ромашка»"}
+    Ответ:       {"name":"ООО «Ромашке»"}
+
+
+  POST /api/org/from — организация в родительном падеже (из какой?)
+  --------------------------------------------------------------------------------
+    Body (JSON): {"name":"ООО «Ромашка»"}
+    Ответ:       {"name":"ООО «Ромашки»"}
+
+
+  POST /api/org/to — организация в винительном падеже (в какую?)
+  --------------------------------------------------------------------------------
+    Body (JSON): {"name":"ООО «Ромашка»"}
+    Ответ:       {"name":"ООО «Ромашку»"}
+
+  Примечание: родовое слово (ООО, ПАО, банк, компания и т.п.) не склоняется —
+  склоняется только значимая часть названия. Аббревиатуры (МТС, РЖД и т.п.)
+  остаются неизменными. Кавычки в названии сохраняются как на входе.
 
 
 ================================================================================
@@ -321,6 +343,87 @@
           <Name>Москву</Name>
         </CityToResponse>
       </soap:Body>
+</soap:Envelope>
+
+
+6. OrgIn - организация в предложном падеже (в какой?)
+-------------------------------------------------------------------------------
+
+  Параметры:
+    Name - string, обязат. - Название организации
+
+  Пример запроса:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <OrgIn xmlns="urn:LvovichService">
+          <Name>ООО «Ромашка»</Name>
+        </OrgIn>
+      </soap:Body>
+    </soap:Envelope>
+
+  Пример ответа:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <OrgInResponse xmlns="urn:LvovichService">
+          <Name>ООО «Ромашке»</Name>
+        </OrgInResponse>
+      </soap:Body>
+    </soap:Envelope>
+
+
+7. OrgFrom - организация в родительном падеже (из какой?)
+-------------------------------------------------------------------------------
+
+  Параметры:
+    Name - string, обязат. - Название организации
+
+  Пример запроса:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <OrgFrom xmlns="urn:LvovichService">
+          <Name>ООО «Ромашка»</Name>
+        </OrgFrom>
+      </soap:Body>
+    </soap:Envelope>
+
+  Пример ответа:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <OrgFromResponse xmlns="urn:LvovichService">
+          <Name>ООО «Ромашки»</Name>
+        </OrgFromResponse>
+      </soap:Body>
+    </soap:Envelope>
+
+
+8. OrgTo - организация в винительном падеже (в какую?)
+-------------------------------------------------------------------------------
+
+  Параметры:
+    Name - string, обязат. - Название организации
+
+  Пример запроса:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <OrgTo xmlns="urn:LvovichService">
+          <Name>ООО «Ромашка»</Name>
+        </OrgTo>
+      </soap:Body>
+    </soap:Envelope>
+
+  Пример ответа:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <OrgToResponse xmlns="urn:LvovichService">
+          <Name>ООО «Ромашку»</Name>
+        </OrgToResponse>
+      </soap:Body>
     </soap:Envelope>
 
 
@@ -337,6 +440,9 @@
   REST        /api/city/in   Город предложный (JSON)
   REST        /api/city/from Город родительный (JSON)
   REST        /api/city/to   Город винительный (JSON)
+  REST        /api/org/in    Организация предложный (JSON)
+  REST        /api/org/from  Организация родительный (JSON)
+  REST        /api/org/to    Организация винительный (JSON)
   Swagger     /api-docs      Интерактивная документация
 
 

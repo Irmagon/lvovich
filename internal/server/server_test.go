@@ -127,6 +127,25 @@ func TestRestCities(t *testing.T) {
 	}
 }
 
+func TestRestOrgs(t *testing.T) {
+	base := startServer(t, testCfg())
+	cases := []struct {
+		url, body, want string
+	}{
+		{"/api/org/in", `{"name":"ООО «Ромашка»"}`, `{"name":"ООО «Ромашке»"}`},
+		{"/api/org/from", `{"name":"ООО «Ромашка»"}`, `{"name":"ООО «Ромашки»"}`},
+		{"/api/org/to", `{"name":"ООО «Ромашка»"}`, `{"name":"ООО «Ромашку»"}`},
+	}
+	for _, c := range cases {
+		r := doReq(t, "POST", base+c.url, map[string]string{
+			"Authorization": authHdr, "Content-Type": "application/json",
+		}, c.body)
+		if r.body != c.want {
+			t.Errorf("%s: body=%q want=%q", c.url, r.body, c.want)
+		}
+	}
+}
+
 func TestRestAuth(t *testing.T) {
 	base := startServer(t, testCfg())
 	r := doReq(t, "POST", base+"/api/incline", map[string]string{
@@ -284,6 +303,29 @@ func TestSoapCityFaultNoName(t *testing.T) {
 	want := "<Fault>Cannot read properties of null (reading &apos;Name&apos;)</Fault>"
 	if r.status != 200 || !strings.Contains(r.body, want) {
 		t.Errorf("status=%d body=%s", r.status, r.body)
+	}
+}
+
+func TestSoapOrgs(t *testing.T) {
+	base := startServer(t, testCfg())
+	cases := []struct {
+		op, act, inner, want string
+	}{
+		{"OrgIn", "urn:OrgIn", "<Name>ООО «Ромашка»</Name>",
+			"<tns:OrgInResponse><OrgInResponse><Name>ООО «Ромашке»</Name></OrgInResponse></tns:OrgInResponse>"},
+		{"OrgFrom", "urn:OrgFrom", "<Name>ООО «Ромашка»</Name>",
+			"<tns:OrgFromResponse><OrgFromResponse><Name>ООО «Ромашки»</Name></OrgFromResponse></tns:OrgFromResponse>"},
+		{"OrgTo", "urn:OrgTo", "<Name>ООО «Ромашка»</Name>",
+			"<tns:OrgToResponse><OrgToResponse><Name>ООО «Ромашку»</Name></OrgToResponse></tns:OrgToResponse>"},
+	}
+	for _, c := range cases {
+		req := `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="urn:LvovichService"><soap:Body><tns:` + c.op + `>` + c.inner + `</tns:` + c.op + `></soap:Body></soap:Envelope>`
+		r := doReq(t, "POST", base+"/soap", map[string]string{
+			"Authorization": authHdr, "Content-Type": "text/xml", "SOAPAction": c.act,
+		}, req)
+		if !strings.Contains(r.body, c.want) {
+			t.Errorf("%s: body=%s", c.op, r.body)
+		}
 	}
 }
 

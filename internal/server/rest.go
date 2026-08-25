@@ -421,6 +421,31 @@ func (s *Server) handleRestCity(w http.ResponseWriter, r *http.Request, kind str
 	sendJSON(w, r, http.StatusOK, JStringify(obj))
 }
 
+func (s *Server) handleRestOrg(w http.ResponseWriter, r *http.Request, kind string) {
+	body := reqBody(r)
+	var nameV *JValue
+	if body != nil {
+		nameV = body.Get("name")
+	}
+	if nameV == nil || !nameV.IsString() {
+		sendJSON(w, r, http.StatusOK, "{}")
+		return
+	}
+	name, _ := nameV.StrVal()
+	var out string
+	switch kind {
+	case "in":
+		out = s.core.OrgIn(name)
+	case "from":
+		out = s.core.OrgFrom(name)
+	default:
+		out = s.core.OrgTo(name)
+	}
+	obj := Obj()
+	obj.Set("name", Str(out))
+	sendJSON(w, r, http.StatusOK, JStringify(obj))
+}
+
 func (s *Server) err500(w http.ResponseWriter, r *http.Request, msg string) {
 	sendJSON(w, r, http.StatusInternalServerError, `{"error":`+quoteJSON(msg)+`}`)
 }
